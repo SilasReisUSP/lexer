@@ -17,7 +17,10 @@ int proximoIndice = 0;
 enum { 
         IF = 1, 
         ELSE, 
-        THEN,
+        INT,
+        RETURN,
+        VOID,
+        WHILE,
         MENOR,
         MAIOR,
         IGUAL,
@@ -36,7 +39,10 @@ enum {
 
 "if"    { return IF; }
 "else"  { return ELSE; }
-"then"  { return THEN; }
+"int"   {return INT;}
+"return" {return RETURN;}
+"void" { return VOID;}
+"while" {return while;}
 "<"  { return MENOR; }
 ">"  { return MAIOR; }
 "="  { return IGUAL; }
@@ -103,8 +109,17 @@ int main() {
             case ELSE:
                 printf("else\n");
                 break;
-            case THEN:
-                printf("then\n");
+            case INT:
+                printf("int\n");
+                break;
+            case RETURN:
+                printf("return\n");
+                break;
+            case VOID:
+                printf("void\n");
+                break;
+            case WHILE:
+                printf("while\n");
                 break;
             case MENOR:
                 printf("< relop LT\n");
