@@ -42,7 +42,7 @@ enum {
 "int"   {return INT;}
 "return" {return RETURN;}
 "void" { return VOID;}
-"while" {return while;}
+"while" {return WHILE;}
 "<"  { return MENOR; }
 ">"  { return MAIOR; }
 "="  { return IGUAL; }
