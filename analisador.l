@@ -93,10 +93,15 @@ enum {
 
 [0-9]+ {
     // Quando um número inteiro é encontrado, imprima-o
-    printf("%s", yytext);
+    printf("(%s, CONSTANTE)\n", yytext);
 }
 
+
+[a-zA-Z]+ {
+    printf("(%s, ID)\n",yytext);
+}
 %%
+
 
 int main() {
     int token;
@@ -104,22 +109,22 @@ int main() {
     while ((token = yylex())) {
         switch (token) {
             case IF:
-                printf("if\n");
+                printf("(if, IF)\n");
                 break;
             case ELSE:
-                printf("else\n");
+                printf("(else, ELSE)\n");
                 break;
             case INT:
-                printf("int\n");
+                printf("(int, INT)\n");
                 break;
             case RETURN:
-                printf("return\n");
+                printf("(return, RETURN)\n");
                 break;
             case VOID:
-                printf("void\n");
+                printf("(void, VOID)\n");
                 break;
             case WHILE:
-                printf("while\n");
+                printf("(while, WHILE)\n");
                 break;
             case MENOR:
                 printf("< relop LT\n");
