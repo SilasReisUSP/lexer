@@ -27,7 +27,20 @@ enum {
         MENORIGUAL,
         MAIORIGUAL,
         DIFERENTE,
-        ERROR
+	SOMA,
+	SUBTRACAO,
+	DIVISAO,
+	MULTIPLICACAO,
+	ATRIBUICAO,
+	PONTOVIRGULA,
+	VIRGULA,
+	ABREPARENTESE,
+	FECHAPARENTESE,
+	ABRECOLCHETE,
+	FECHACOLCHETE,
+	ABRECHAVE,
+	FECHACHAVE,
+        ERROR,
      };
 %}
 
@@ -45,10 +58,23 @@ enum {
 "while" {return WHILE;}
 "<"  { return MENOR; }
 ">"  { return MAIOR; }
-"="  { return IGUAL; }
+"=="  { return IGUAL; }
 "<="  { return MENORIGUAL; }
 ">="  { return MAIORIGUAL; }
-"<>"  { return DIFERENTE; }
+"!="  { return DIFERENTE; }
+"+" {return SOMA;}
+"-" {return SUBTRACAO;}
+"/" {return DIVISAO;}
+"*" {return MULTIPLICACAO;}
+"=" {return ATRIBUICAO;}
+";" {return PONTOVIRGULA;}
+"," {return VIRGULA;}
+"(" {return ABREPARENTESE;}
+")" { return FECHAPARENTESE;}
+"[" {return ABRECOLCHETE;}
+"]" {return FECHACOLCHETE;}
+"{" {return ABRECHAVE;}
+"}" {return FECHACHAVE;}
 
 "int" {
     //Armazena valores inteiros em uma tabela
@@ -92,7 +118,6 @@ enum {
 }
 
 [0-9]+ {
-    // Quando um número inteiro é encontrado, imprima-o
     printf("(%s, CONSTANTE)\n", yytext);
 }
 
@@ -100,6 +125,14 @@ enum {
 [a-zA-Z]+ {
     printf("(%s, ID)\n",yytext);
 }
+
+[ \t]+ /* ignora */  
+[\r\n]+ /*ignora */
+. {
+printf("(%s, ERROR)\n",yytext);
+}
+
+
 %%
 
 
@@ -127,23 +160,62 @@ int main() {
                 printf("(while, WHILE)\n");
                 break;
             case MENOR:
-                printf("< relop LT\n");
+                printf("(< relop LT)\n");
                 break;
             case MAIOR:
-                printf("> relop GT\n");
+                printf("(> relop GT)\n");
                 break;
             case IGUAL:
-                printf("= relop EQ\n");
+                printf("(== relop EQ)\n");
                 break;
             case MENORIGUAL:
-                printf("<= relop LE\n");
+                printf("(<= relop LE)\n");
                 break;
             case MAIORIGUAL:
-                printf(">= relop GE\n");
+                printf("(>= relop GE)\n");
                 break;
             case DIFERENTE:
-                printf("<> relop NE\n");
+                printf("(!=, relop NE)\n)");
                 break;
+	    case SOMA:
+		printf("(+, arit SUM)\n");
+		break;
+	    case SUBTRACAO:
+		printf("(-, arit SUB)\n");
+		break;
+	    case DIVISAO:
+		printf("(/, arit DIV)\n");
+		break;
+	    case MULTIPLICACAO:
+		printf("(*, arit MT)\n");
+		break;
+	    case ATRIBUICAO:
+		printf("(=, atribuicao ASSIGN)\n");
+		break;
+	    case PONTOVIRGULA:
+		printf("(;, especial SC)\n");
+		break;
+	    case VIRGULA:
+		printf("(,, especial COMMA)\n");
+		break;
+	    case ABREPARENTESE:
+		printf("((, especial OP)\n");
+		break;
+	    case FECHAPARENTESE:
+		printf("(), especial CP)\n");
+		break;
+            case ABRECOLCHETE:
+		printf("([, especial OC)\n");
+		break;
+	    case FECHACOLCHETE:
+		printf("(], especial CC)\n");
+		break;
+            case ABRECHAVE:
+		printf("({, especial OCB)\n");
+		break;
+	    case FECHACHAVE:
+		printf("(}, especial CCB)\n");
+		break;
             /* Outros casos para tokens */
             default:
                 printf("Token não reconhecido\n");
