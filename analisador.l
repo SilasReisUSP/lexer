@@ -11,6 +11,8 @@ typedef struct {
 EntradaTabela tabelaSimbolos[100];
 
 int proximoIndice = 0; 
+int erro = 0;
+
 %}
 
 %{
@@ -27,6 +29,8 @@ enum {
         MENORIGUAL,
         MAIORIGUAL,
         DIFERENTE,
+	INCREMENTO,
+	DECREMENTO,
 	SOMA,
 	SUBTRACAO,
 	DIVISAO,
@@ -39,12 +43,14 @@ enum {
 	ABRECOLCHETE,
 	FECHACOLCHETE,
 	ABRECHAVE,
-	FECHACHAVE,
+	FECHACHAVE,	
         ERROR,
+
      };
 %}
 
 %x comentario
+%option yylineno
 
 %%
 
@@ -62,7 +68,9 @@ enum {
 "<="  { return MENORIGUAL; }
 ">="  { return MAIORIGUAL; }
 "!="  { return DIFERENTE; }
+"++" {return INCREMENTO;}
 "+" {return SOMA;}
+"--" {return DECREMENTO;}
 "-" {return SUBTRACAO;}
 "/" {return DIVISAO;}
 "*" {return MULTIPLICACAO;}
@@ -75,6 +83,7 @@ enum {
 "]" {return FECHACOLCHETE;}
 "{" {return ABRECHAVE;}
 "}" {return FECHACHAVE;}
+
 
 "int" {
     //Armazena valores inteiros em uma tabela
@@ -114,24 +123,58 @@ enum {
     }
     [^*]+    ; // Ignorar outros caracteres dentro de um comentário
     "*"      ; // Ignorar "*" solto dentro de um comentário
-    \n       ; // Ignorar quebras de linha dentro de um comentário
+ \n       ; // Ignorar quebras de linha dentro de um comentário
 }
 
-[0-9]+ {
+"/*" {
+    // Iniciar o estado de comentário
+    BEGIN(comentario);
+}
+
+<comentario>"/*" {
+    // Comentário aninhado, incrementar contadores ou tratar como erro
+}
+
+<comentario>\n {
+    // Ignorar quebras de linha dentro de um comentário
+}
+
+<comentario>. {
+    // Ignorar outros caracteres dentro de um comentário
+}
+
+
+<<EOF>> {
+    if (YY_START == comentario) {
+        // ERROR: Comentário não foi fechado corretamente
+         fprintf(stderr, "ERROR, linha %d: Comentário não foi fechado corretamente\n", yylineno);
+	yylineno++;
+        exit(1); // Encerrar o programa com erro
+    }
+    // Encerrar o programa normalmente se não estiver em um comentário
+    exit(0);
+}
+
+[0-9][0-9]* {
     printf("(%s, CONSTANTE)\n", yytext);
 }
 
+[a-zA-Z][a-zA-Z]* {
+    printf("(%s, ID)\n", yytext);
+}
 
-[a-zA-Z]+ {
-    printf("(%s, ID)\n",yytext);
+. {
+    printf("(%s, ERROR, linha %d)\n", yytext, yylineno);
+    int i;
+    for (i = 0; yytext[i] != '\0'; i++) {
+        if (yytext[i] == '\n') {
+            yylineno++;
+        }
+    }
 }
 
 [ \t]+ /* ignora */  
 [\r\n]+ /*ignora */
-. {
-printf("(%s, ERROR)\n",yytext);
-}
-
 
 %%
 
@@ -177,6 +220,12 @@ int main() {
             case DIFERENTE:
                 printf("(!=, relop NE)\n)");
                 break;
+	    case INCREMENTO:
+		printf("(++, especial INCR)\n");
+		break;
+            case DECREMENTO:
+		printf("(--, especial DECR)\n");
+		break;
 	    case SOMA:
 		printf("(+, arit SUM)\n");
 		break;
@@ -216,6 +265,7 @@ int main() {
 	    case FECHACHAVE:
 		printf("(}, especial CCB)\n");
 		break;
+	    
             /* Outros casos para tokens */
             default:
                 printf("Token não reconhecido\n");
